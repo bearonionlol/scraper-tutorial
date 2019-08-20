@@ -56,10 +56,16 @@ def run_scraper():
         headline = a['headline']
         url = a['url']
         article_body = a['article_body']
+        art = Article()
 
-        print('Headline: {} URL: {}'.format(headline, a['url']))
+        art.headline = headline
+        art.url = url
+        art.body = article_body
+        art.save()
 
-        print("Article Body: \n\n\n\n\n\n\n{}".format(article_body))
+        # print('Headline: {} URL: {}'.format(headline, a['url']))
+        #
+        # print("Article Body: \n\n\n\n\n\n\n{}".format(article_body))
 
 
 def run_scraper2():
@@ -110,17 +116,23 @@ def run_scraper2():
         headline = a['headline']
         url = a['url']
         article_body = a['article_body']
+        art = Article()
 
-        print('Headline: {} URL: {}'.format(headline, a['url']))
+        art.headline = headline
+        art.url = url
+        art.body = article_body
+        art.save()
 
-        print("Article Body: \n{}\n\n".format(article_body))
-
-        scraper_data = Article.objects.all()
-        for data in scraper_data:
-            data.url_name = url
-            data.article_headline = headline
-            data.article_text = article_body
-            data.save()
+        # # print('Headline: {} URL: {}'.format(headline, a['url']))
+        #
+        # print("Article Body: \n{}\n\n".format(article_body))
+        #
+        # scraper_data = Article.objects.all()
+        # for data in scraper_data:
+        #     data.url_name = url
+        #     data.article_headline = headline
+        #     data.article_text = article_body
+        #     data.save()
 
 
 class Command(BaseCommand):
