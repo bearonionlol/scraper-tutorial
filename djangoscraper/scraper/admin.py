@@ -2,4 +2,11 @@ from django.contrib import admin
 
 from .models import Article
 
-admin.site.register(Article)
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ('article_headline', 'url_name',)
+    # fields = ('article_headline', 'url_name')
+
+    pass
+
+
