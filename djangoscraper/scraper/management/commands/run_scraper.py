@@ -1,19 +1,65 @@
 from django.core.management.base import BaseCommand
 from scraper.models import Article
 from requests_html import HTMLSession
+import sqlite3
+from sqlite3 import Error
 
 def get_session(url, selector):
     session = HTMLSession()
     r = session.get(url)
-    r.html.render()
+    #r.html.render()
     return r.html.find(selector)
+
+
+def create_connection(scraper_article):
+    
+    try:
+        conn = sqlite3.connect(scraper_article)
+        return conn
+    except Error as e:
+        print(e)
+
+    return None
+
+
+def prevent_duplicates(conn):
+    headline = ['headline']
+    url = ['url']
+
+    # Create cursor object
+    cur = conn.db.cursor()
+
+    # run a select query against the table to see if any record exists
+    # that has the email or username
+    cur.execute("""SELECT headline
+                          ,url
+                   FROM scraper_article
+                   WHERE headline=?
+                       OR url=?""",
+                (headline, url))
+
+    result = cur.fetchall()
+
+    if result:
+        pass
+    else:
+        cur.execute("INSERT INTO scraper_article VALUES (?, ?)", (headline, url))
+        conn.db.commit()
 
 
 def save_article(article):
     headline = article['headline']
     url = article['url']
     article_body = article['article_body']
+    website_name = article['website_name']
     art = Article()
+
+    database = "C:\\sqlite\db\pythonsqlite.db"
+
+    # create a database connection
+    conn = create_connection(database)
+    with conn:
+        prevent_duplicates(conn)
 
     print("Saving article {} {}".format(headline, url))
 
@@ -29,7 +75,9 @@ def save_article(article):
     art.article_headline = headline
     art.url_name = url
     art.article_text = article_body
+    art.website_name = website_name
     art.save()
+    prevent_duplicates(conn)
 
 
 def run_scraper():
@@ -66,7 +114,8 @@ def run_scraper():
         out = {
             'headline': headline,
             'url': url,
-            'article_body': article_body
+            'article_body': article_body,
+            'website_name': 'CNBC'
         }
 
         print("fetched {}".format(url))
@@ -75,8 +124,8 @@ def run_scraper():
 
         counter += 1
 
-        # if counter > 5:
-        #     break
+            # if counter > 5:
+            #     break
 
     for a in all_articles:
         # headline = a['headline']
@@ -140,7 +189,8 @@ def run_scraper2():
         out = {
             'headline': headline,
             'url': url,
-            'article_body': article_body
+            'article_body': article_body,
+            'website_name': 'Market Watch'
         }
 
         all_articles.append(out)
@@ -179,7 +229,7 @@ def run_scraper2():
 class Command(BaseCommand):
     def handle(self, **options):
         run_scraper()
-        # run_scraper2()
+        run_scraper2()
 
 
 
